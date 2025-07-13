@@ -130,13 +130,21 @@ export function Dashboard() {
             <TabsTrigger value="pomodoro">Pomodoro</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="today" className="space-y-6">
+          <TabsContent value="today" className="space-y-6 relative">
             {/* Date Selector only in Daily tab */}
             <DateSelector 
               selectedDate={selectedDate}
               onDateSelect={setSelectedDate}
             />
             <DailyStats selectedDate={selectedDate} onUpdateHabit={updateHabit} />
+            {/* Floating Add Habit Button */}
+            <button
+              className="fixed bottom-8 right-8 z-50 bg-primary text-white rounded-full shadow-lg p-4 flex items-center justify-center hover:bg-primary/90 transition-colors"
+              onClick={() => setIsCreateModalOpen(true)}
+              aria-label="Add Habit"
+            >
+              <Plus className="h-6 w-6" />
+            </button>
           </TabsContent>
 
           <TabsContent value="calendar" className="space-y-6">
