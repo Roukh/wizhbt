@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Habit {
+  id          Int                 @id @default(autoincrement())
+  name        String
+  description String?
+  checklist   Json
+  requiredItems Int
+  startDate   DateTime
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  pomodoros   PomodoroSession[]
+  events      CalendarEvent[]
+  statistics  HabitStatistics[]
+}
+
+model PomodoroSession {
+  id        Int       @id @default(autoincrement())
+  habit     Habit?    @relation(fields: [habitId], references: [id])
+  habitId   Int?
+  start     DateTime  @default(now())
+  end       DateTime?
+  duration  Int?      // seconds
+  targetDuration Int? // target duration in seconds
+  status    String    @default("active") // active, completed, cancelled
+  createdAt DateTime  @default(now())
+}
+
+model CalendarEvent {
+  id        Int      @id @default(autoincrement())
+  habit     Habit?   @relation(fields: [habitId], references: [id])
+  habitId   Int?
+  title     String
+  date      DateTime
+  completed Boolean  @default(false)
+  type      String   @default("habit") // habit, pomodoro
+  duration  Int?     // for pomodoro events
+  createdAt DateTime @default(now())
+}
+
+model HabitStatistics {
+  id        Int      @id @default(autoincrement())
+  habit     Habit    @relation(fields: [habitId], references: [id])
+  habitId   Int
+  date      DateTime
+  totalPomodoros Int @default(0)
+  totalDuration   Int @default(0) // in seconds
+  completedHabits Int @default(0)
+  failedHabits    Int @default(0)
+  createdAt DateTime @default(now())
+  
+  @@unique([habitId, date])
+}
