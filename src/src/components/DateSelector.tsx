@@ -1,5 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DateSelectorProps {
@@ -53,39 +52,58 @@ export function DateSelector({ selectedDate, onDateSelect }: DateSelectorProps) 
   ];
 
   return (
-    <div className="bg-card border-b">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between mb-4">
-          <Button variant="outline" size="sm" onClick={goToPreviousMonth}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          
-          <h2 className="text-lg font-semibold">
+    <div className="neumorphic-card">
+      <div className="flex items-center justify-between mb-4">
+        {/* Remove previous/next month arrows */}
+        <div className="flex items-center gap-2 ml-4">
+          <h2 className="text-lg font-bold" style={{ color: '#fff', marginLeft: '2px' }}>
             {monthNames[currentMonth]} {currentYear}
           </h2>
-          
-          <Button variant="outline" size="sm" onClick={goToNextMonth}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
         </div>
-        
-        <div className="flex gap-1 overflow-x-auto pb-2">
-          {days.map((day) => (
-            <Button
-              key={day}
-              variant={isSelected(day) ? "default" : "outline"}
-              size="sm"
-              onClick={() => selectDay(day)}
-              className={cn(
-                "min-w-[40px] h-10 flex-shrink-0",
-                isToday(day) && !isSelected(day) && "border-primary",
-                isSelected(day) && "bg-primary text-primary-foreground"
-              )}
-            >
-              {day}
-            </Button>
-          ))}
-        </div>
+      </div>
+      
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        {days.map((day) => (
+          <button
+            key={day}
+            onClick={() => selectDay(day)}
+            className={cn(
+              "min-w-[44px] h-12 rounded-xl font-medium transition-all touch-target flex items-center justify-center",
+              isSelected(day) 
+                ? "bg-primary text-primary-foreground shadow-pressed" 
+                : isToday(day)
+                ? "bg-warning/10 text-warning border-2 border-warning/20 shadow-soft"
+                : "bg-muted/20 text-foreground hover:bg-muted/30 shadow-soft hover:shadow-hover"
+            )}
+          >
+            {day}
+          </button>
+        ))}
+      </div>
+      
+      {/* Quick navigation buttons */}
+      <div className="flex gap-2 mt-4 pt-4 border-t border-border">
+        <button
+          onClick={() => {
+            const todayMidnight = new Date();
+            todayMidnight.setHours(0, 0, 0, 0);
+            onDateSelect(todayMidnight);
+          }}
+          className="flex-1 neumorphic-button secondary text-sm touch-target"
+        >
+          Today
+        </button>
+        <button
+          onClick={() => {
+            const yesterday = new Date();
+            yesterday.setHours(0, 0, 0, 0);
+            yesterday.setDate(yesterday.getDate() - 1);
+            onDateSelect(yesterday);
+          }}
+          className="flex-1 neumorphic-button secondary text-sm touch-target"
+        >
+          Yesterday
+        </button>
       </div>
     </div>
   );
