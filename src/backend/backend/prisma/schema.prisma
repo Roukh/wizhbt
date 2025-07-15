@@ -42,6 +42,7 @@ model CalendarEvent {
   completed Boolean  @default(false)
   type      String   @default("habit") // habit, pomodoro
   duration  Int?     // for pomodoro events
+  checklist Json?    // per-day habit checklist state
   createdAt DateTime @default(now())
 }
 

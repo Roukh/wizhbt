@@ -203,4 +203,46 @@ router.get("/stats", async (req, res) => {
   res.json(stats);
 });
 
+// Get pomodoro statistics grouped by day
+router.get("/stats/daily", async (req, res) => {
+  const prisma: PrismaClient = req.app.locals.prisma;
+  const { startDate, endDate, habitId } = req.query;
+
+  let whereClause: any = {};
+  if (startDate && endDate) {
+    whereClause.start = {
+      gte: new Date(startDate as string),
+      lte: new Date(endDate as string)
+    };
+  }
+  if (habitId) {
+    whereClause.habitId = Number(habitId);
+  }
+
+  const sessions = await prisma.pomodoroSession.findMany({
+    where: whereClause,
+    select: {
+      id: true,
+      habitId: true,
+      start: true,
+      end: true,
+      duration: true,
+      status: true,
+    },
+    orderBy: { start: 'asc' }
+  });
+
+  // Group by day (YYYY-MM-DD)
+  const grouped: Record<string, { totalSessions: number; totalDuration: number; sessions: any[] }> = {};
+  for (const s of sessions) {
+    const day = s.start.toISOString().split('T')[0];
+    if (!grouped[day]) grouped[day] = { totalSessions: 0, totalDuration: 0, sessions: [] };
+    grouped[day].totalSessions++;
+    grouped[day].totalDuration += s.duration || 0;
+    grouped[day].sessions.push(s);
+  }
+
+  res.json(grouped);
+});
+
 export default router;
